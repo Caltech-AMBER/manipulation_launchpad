@@ -22,7 +22,6 @@ def R_from_RPY(r, p, y):
     return Rx@Ry@Rz
 
 def T_from_DH(a, d, alpha, theta):
-    #return np.array([[np.cos(theta), -np.sin(theta), 0.0, a], [np.sin(theta)*np.cos(alpha), np.cos(theta)*np.cos(alpha), np.sin(alpha), -d*np.sin(alpha)], [np.sin(theta)*np.sin(alpha), np.cos(theta)*np.sin(alpha), np.cos(alpha), d*np.cos(alpha)], [0.0, 0.0, 0.0, 1.0]])
     return np.array([[np.cos(theta), -np.sin(theta)*np.cos(alpha), np.sin(theta)*np.sin(alpha), a*np.cos(theta)], [np.sin(theta), np.cos(theta)*np.cos(alpha), -np.cos(theta)*np.sin(alpha), a*np.sin(theta)], [0.0, np.sin(alpha), np.cos(alpha), d], [0.0, 0.0, 0.0, 1.0]])
 
 def T_from_DH_modified(a, d, alpha, theta):
@@ -90,11 +89,9 @@ def FK_modified(thetas, T_b0 = np.eye(4), T_6t = np.eye(4)):
     return T_b0@T@T_6t
 
 def tan_half_angle(E, F, G):
-    print("E, F, G: ", E, F, G)
     EPSILON=1e-12
     internal = E**2+F**2-G**2
     if internal < EPSILON:
-        print("HIT EPSILON LIMIT, internal: ", internal)
         internal = EPSILON
     t_plus, t_minus = (-F + np.sqrt(internal))/(G-E), (-F - np.sqrt(internal))/(G-E)
     return 2*np.arctan(t_plus), 2*np.arctan(t_minus)
@@ -103,7 +100,6 @@ def IK(T_bt, T_b0 = np.eye(4), T_6t = np.eye(4)):
     DH_table = UR10e_DH_table()
     a, d, alpha = DH_table[:, 0], DH_table[:, 1], DH_table[:, 2]
     T_06 = T_inv(T_b0)@T_bt@T_inv(T_6t)
-    print("T_06: ", T_06)
     thetas = np.zeros((6, 4))
 
     x = T_06[0, -1]
@@ -140,19 +136,19 @@ def IK(T_bt, T_b0 = np.eye(4), T_6t = np.eye(4)):
         # theta 2
         theta5 = thetas[4, i]
 
-        A = (r31*np.cos(theta6)-r32*np.sin(theta6))/np.cos(theta5) #0 # This is zero but should be one...
+        A = (r31*np.cos(theta6)-r32*np.sin(theta6))/np.cos(theta5) 
         print("A: ", A)
         B = r32*np.cos(theta6) + r31*np.sin(theta6) #1
         print("B: ", B)
 
         small_a = -x*np.cos(theta1) - y*np.sin(theta1) - d[4]*A #0
         print("small_a: ", small_a)
-        small_b = z - d[4]*B #1.4848-0.11985
+        small_b = z - d[4]*B 
         print("small_b: ", small_b)
 
-        E2 = 2*a[1]*small_b # Flipped the a sign here to match their convention #2*0.613*1.36 = 1.667
-        F2 = 2*a[1]*small_a #0
-        G2 = a[1]**2 + small_a**2 + small_b**2 - a[2]**2 #0.613**2 + 0**2 + 1.36**2 - 0.572**2 = 1.898
+        E2 = 2*a[1]*small_b 
+        F2 = 2*a[1]*small_a 
+        G2 = a[1]**2 + small_a**2 + small_b**2 - a[2]**2 
 
         theta2_plus, theta2_minus = tan_half_angle(E2, F2, G2)
         if i == 0 or i == 1:
@@ -168,5 +164,4 @@ def IK(T_bt, T_b0 = np.eye(4), T_6t = np.eye(4)):
         theta3 = thetas[2, i]
         thetas[3, i] = np.arctan2(A, B) - theta2 - theta3
 
-    print("Thetas: ", thetas)
     return thetas
