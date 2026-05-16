@@ -8,7 +8,7 @@ If you would like to reserve time to work on the UR10e or Franka arms, please us
 
 [UR10e Booking Calendar](https://docs.google.com/spreadsheets/d/1dOwqv0ddb73xd9MdWtdaJUp9k-KB0nYpMaP0OMFp9vw/edit?usp=sharing)
 
-[Franka Scheduling Calendar](https://docs.google.com/spreadsheets/d/1JxUUr9k4kDnLuvDe_D6YIsBMcdYbYPkfLR9bNocWoUs/edit?usp=sharing) 
+[Franka Booking Calendar](https://docs.google.com/spreadsheets/d/1JxUUr9k4kDnLuvDe_D6YIsBMcdYbYPkfLR9bNocWoUs/edit?usp=sharing) 
 
 # Documents
 
