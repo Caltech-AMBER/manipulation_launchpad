@@ -4,6 +4,7 @@ from pyrobotiqur import RobotiqGripper
 #import helpers
 import time
 import numpy as np
+from ur10e_utils import *
 
 #set accel/vel limits
 aj = 1      # rad/s²
@@ -100,5 +101,22 @@ homePose = rob.getl()
 print("Current tool pose is: ",  rob.getl())
 print("The start pose was: ",  startPose)
 print("The second pose was: ",  secondPose)
+
+
+### IK Example
+T_bg = np.eye(4)
+T_bg[0:3, 0:3] = R_from_RPY(0.0, 0.0, 35/36*np.pi) # face nearly downwards, but avoid singular configuration
+T_bg[0:3, 3] = np.array([0.0, -0.4, 0.3])
+
+T_flange_g = np.eye(4)
+T_flange_g[2, 3] = 0.2 # assume gripper is 20cm long
+
+curr_angles = rob.getj() # get current position as reference
+joint_angles = IK(T_bg, T_flange_g, curr_angles) # solve for requisite joint angles
+
+rob.movej(joint_angles, aj, vj,wait=True) # go to calculated joint angles
+rob.stopj(aj)
+
+
 
 rob.close()

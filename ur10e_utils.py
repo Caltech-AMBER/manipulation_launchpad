@@ -9,6 +9,8 @@ import copy
 import matplotlib.pyplot as plt
 import pickle
 
+HOME = np.array([0.0, -np.pi/2, 0.0, -np.pi/2, 0.0, 0.0])
+
 def T_inv(T):
     R = T[0:3, 0:3]
     d = T[0:3, 3]
@@ -96,7 +98,24 @@ def tan_half_angle(E, F, G):
     t_plus, t_minus = (-F + np.sqrt(internal))/(G-E), (-F - np.sqrt(internal))/(G-E)
     return 2*np.arctan(t_plus), 2*np.arctan(t_minus)
 
-def IK(T_bt, T_b0 = np.eye(4), T_6t = np.eye(4)):
+def IK(T_bt, T_flange_t = np.eye(4), thetas_prior = HOME):
+    T_b0 = np.eye(4)
+    T_b0[2, 3] = 0.1807
+    T_6_flange = np.eye(4)
+    T_6_flange[2, 3] = 0.11655 # This is the extra offset from the 6th frame to the center of the flange in the Williams convention  
+
+    thetas_modified = _IK(T_bt, T_b0, T_6_flange@T_flange_t)
+    thetas_classical = thetas_modified_to_orig(thetas_modified)
+    thetas_safe_inds = [safety_filter(thetas_classical[:, i], [], [T_flange_t]) for i in range(0, thetas_classical.shape[1])]
+    if not np.any(thetas_safe):
+        print("No safe configurations to solve IK for ", T_bt)
+        return False
+    thetas_classical = thetas_classical[thetas_safe_inds]
+    nearest_theta_ind = np.argmin(np.linalg.norm(thetas_classical - np.expand_dims(thetas_prior, axis=1), axis=0)) # choose closest angle solution
+    
+    return thetas_classical[:, nearest_theta_ind]
+
+def _IK(T_bt, T_b0 = np.eye(4), T_6t = np.eye(4)):
     DH_table = UR10e_DH_table()
     a, d, alpha = DH_table[:, 0], DH_table[:, 1], DH_table[:, 2]
     T_06 = T_inv(T_b0)@T_bt@T_inv(T_6t)
