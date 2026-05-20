@@ -105,12 +105,12 @@ def IK(T_bt, T_flange_t = np.eye(4), thetas_prior = HOME):
     T_6_flange[2, 3] = 0.11655 # This is the extra offset from the 6th frame to the center of the flange in the Williams convention  
 
     thetas_modified = _IK(T_bt, T_b0, T_6_flange@T_flange_t)
-    thetas_classical = thetas_modified_to_orig(thetas_modified)
+    thetas_classical = theta_modified_to_orig(thetas_modified)
     thetas_safe_inds = [safety_filter(thetas_classical[:, i], [], [T_flange_t]) for i in range(0, thetas_classical.shape[1])]
-    if not np.any(thetas_safe):
+    if not np.any(thetas_safe_inds):
         print("No safe configurations to solve IK for ", T_bt)
         return False
-    thetas_classical = thetas_classical[thetas_safe_inds]
+    thetas_classical = thetas_classical[:, thetas_safe_inds]
     nearest_theta_ind = np.argmin(np.linalg.norm(thetas_classical - np.expand_dims(thetas_prior, axis=1), axis=0)) # choose closest angle solution
     
     return thetas_classical[:, nearest_theta_ind]
@@ -156,14 +156,10 @@ def _IK(T_bt, T_b0 = np.eye(4), T_6t = np.eye(4)):
         theta5 = thetas[4, i]
 
         A = (r31*np.cos(theta6)-r32*np.sin(theta6))/np.cos(theta5) 
-        print("A: ", A)
         B = r32*np.cos(theta6) + r31*np.sin(theta6) #1
-        print("B: ", B)
 
         small_a = -x*np.cos(theta1) - y*np.sin(theta1) - d[4]*A #0
-        print("small_a: ", small_a)
         small_b = z - d[4]*B 
-        print("small_b: ", small_b)
 
         E2 = 2*a[1]*small_b 
         F2 = 2*a[1]*small_a 
