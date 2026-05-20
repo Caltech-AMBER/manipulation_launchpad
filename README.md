@@ -23,6 +23,6 @@ ur10e_utils.py - this python file contains forward and inverse kinematics for th
 ur10e_example.py - this python file provides a simple overview of how to move the UR10e using the urx library.
 
 # Safety
-You need to complete both the generic Caltech laboratory safety training, and an arm-lab-specific safety orientation to be approved for access to the arm lab. This orientation follows what is set out in the Safety Orientation pdf file. Once completed, the Safety Coordinator can send a signed safety sheet to Lynn Seymour who can apply for you to have access.
+You need to complete both the generic [Caltech laboratory safety training](https://safety.caltech.edu/root-pages/lab-safety-orientation?utm_source=copilot.com), and an arm-lab-specific safety orientation to be approved for access to the arm lab. This orientation follows what is set out in the Safety Orientation pdf file. Once completed, the Safety Coordinator can send a signed safety sheet to Lynn Seymour who can apply for you to have access.
 
 
